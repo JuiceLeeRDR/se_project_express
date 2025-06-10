@@ -1,10 +1,11 @@
 const router = require("express").Router();
+
 console.log("Clothing items router accessed");
 
 const {
   getClothingItems,
   createClothingItem,
-  updateItem,
+  // updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
@@ -12,7 +13,7 @@ const {
 
 router.get("/", getClothingItems);
 router.post("/", createClothingItem);
-router.put("/:itemId", updateItem);
+// router.put("/:itemId", updateItem);
 router.delete("/:itemId", deleteItem);
 router.put("/:itemId/likes", likeItem);
 router.delete("/:itemId/likes", dislikeItem);

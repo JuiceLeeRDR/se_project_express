@@ -12,7 +12,9 @@ const getClothingItems = (req, res) => {
     .then((clothingItem) => res.status(REQUEST_SUCCESS_CODE).send(clothingItem))
     .catch((err) => {
       console.error(err);
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -32,34 +34,38 @@ const createClothingItem = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data." });
       }
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
-const updateItem = (req, res) => {
-  console.log("updateItem function called with itemId:", req.params.itemId);
+// const updateItem = (req, res) => {
+//   console.log("updateItem function called with itemId:", req.params.itemId);
 
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
+//   const { itemId } = req.params;
+//   const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
-    .catch((err) => {
-      console.error("Full error object:", err);
-      console.error("Error name:", err.name);
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
-      }
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
-    });
-};
+//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
+//     .orFail()
+//     .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
+//     .catch((err) => {
+//       console.error("Full error object:", err);
+//       console.error("Error name:", err.name);
+//       if (err.name === "DocumentNotFoundError") {
+//         return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
+//       } else if (err.name === "CastError") {
+//         return res
+//           .status(BAD_REQUEST_ERROR_CODE)
+//           .send({ message: "Invalid data." });
+//       }
+//       return res
+//         .status(DEFAULT_ERROR_CODE)
+//         .send({ message: "An error has occurred on the server." });
+//     });
+// };
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
@@ -67,17 +73,20 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(REQUEST_SUCCESS_CODE).send({}))
+    .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data." });
       }
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -95,12 +104,15 @@ const likeItem = (req, res) => {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -116,19 +128,22 @@ const dislikeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
+          .send({ message: "Invalid data." });
       }
-      return res.status(DEFAULT_ERROR_CODE).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
 module.exports = {
   getClothingItems,
   createClothingItem,
-  updateItem,
+  // updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
