@@ -71,9 +71,19 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   console.log(itemId);
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
+    // .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(403)
+          .send({ message: "You can only delete your own items." });
+      }
+      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
+        res.status(REQUEST_SUCCESS_CODE).send(deleteItem)
+      );
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {

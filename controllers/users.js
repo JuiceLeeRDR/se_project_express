@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const {
   REQUEST_SUCCESS_CODE,
@@ -20,10 +22,17 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email } = req.body;
 
-  User.create({ name, avatar })
-    .then((user) => res.status(CREATE_REQUEST_SUCCESS_CODE).send(user))
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((user) => {
+      res.status(CREATE_REQUEST_SUCCESS_CODE).send({
+        _id: user._id,
+        email: user.email,
+      });
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -58,4 +67,42 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser };
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials({ email, password })
+    .then((user) => {
+      // res.status(REQUEST_SUCCESS_CODE).send(user);
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+const updateProfile = (req, res) => {
+  const { name, avatar } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((updatedUser) => res.status(REQUEST_SUCCESS_CODE).send(updatedUser))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid data." });
+      }
+      return res
+        .status(DEFAULT_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+module.exports = { getUsers, createUser, getUser, login, updateProfile };
