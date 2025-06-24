@@ -6,7 +6,6 @@ console.log("Clothing items router accessed");
 const {
   getClothingItems,
   createClothingItem,
-  // updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
@@ -14,7 +13,6 @@ const {
 
 router.get("/", getClothingItems);
 router.post("/", auth, createClothingItem);
-// router.put("/:itemId", updateItem);
 router.delete("/:itemId", auth, deleteItem);
 router.put("/:itemId/likes", auth, likeItem);
 router.delete("/:itemId/likes", auth, dislikeItem);

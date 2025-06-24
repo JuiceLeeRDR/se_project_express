@@ -4,6 +4,7 @@ const {
   CREATE_REQUEST_SUCCESS_CODE,
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
   DEFAULT_ERROR_CODE,
 } = require("../utils/errors");
 
@@ -42,46 +43,20 @@ const createClothingItem = (req, res) => {
     });
 };
 
-// const updateItem = (req, res) => {
-//   console.log("updateItem function called with itemId:", req.params.itemId);
-
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-
-//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
-//     .catch((err) => {
-//       console.error("Full error object:", err);
-//       console.error("Error name:", err.name);
-//       if (err.name === "DocumentNotFoundError") {
-//         return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-//       } else if (err.name === "CastError") {
-//         return res
-//           .status(BAD_REQUEST_ERROR_CODE)
-//           .send({ message: "Invalid data." });
-//       }
-//       return res
-//         .status(DEFAULT_ERROR_CODE)
-//         .send({ message: "An error has occurred on the server." });
-//     });
-// };
-
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   console.log(itemId);
 
   ClothingItem.findById(itemId)
     .orFail()
-    // .then((item) => res.status(REQUEST_SUCCESS_CODE).send(item))
     .then((item) => {
       if (item.owner.toString() !== req.user._id) {
         return res
-          .status(403)
+          .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "You can only delete your own items." });
       }
       return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
-        res.status(REQUEST_SUCCESS_CODE).send(deleteItem)
+        res.status(REQUEST_SUCCESS_CODE).send(deletedItem)
       );
     })
     .catch((err) => {
@@ -153,7 +128,6 @@ const dislikeItem = (req, res) => {
 module.exports = {
   getClothingItems,
   createClothingItem,
-  // updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
