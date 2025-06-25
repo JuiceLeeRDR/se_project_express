@@ -10,6 +10,9 @@ const { PORT = 3001 } = process.env;
 app.use(cors());
 app.use(express.json());
 
+app.post("/singin", login);
+app.post("/singup", createUser);
+
 app.use(mainRouter);
 mongoose
   .connect("mongodb://localhost:27017/wtwr_db")
@@ -21,8 +24,3 @@ mongoose
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
-
-app.post("/singin", login);
-app.post("/singup", createUser);
-
-app.use(auth);

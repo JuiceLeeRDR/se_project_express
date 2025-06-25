@@ -12,18 +12,6 @@ const {
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
-// const getUsers = (req, res) => {
-//   console.log("IN CTRLR");
-//   User.find({})
-//     .then((users) => res.status(REQUEST_SUCCESS_CODE).send(users))
-//     .catch((err) => {
-//       console.error(err);
-//       return res
-//         .status(DEFAULT_ERROR_CODE)
-//         .send({ message: "An error has occurred on the server." });
-//     });
-// };
-
 const createUser = (req, res) => {
   const { name, avatar, email } = req.body;
 
@@ -38,7 +26,9 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(CONFLICT_ERROR_CODE);
+        return res
+          .status(CONFLICT_ERROR_CODE)
+          .send({ message: "A conflict has occurred" });
       }
       if (err.name === "ValidationError") {
         return res
@@ -52,7 +42,7 @@ const createUser = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => res.status(REQUEST_SUCCESS_CODE).send(user))
