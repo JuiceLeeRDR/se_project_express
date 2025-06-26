@@ -1,8 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
 
-console.log("Clothing items router accessed");
-
 const {
   getClothingItems,
   createClothingItem,
