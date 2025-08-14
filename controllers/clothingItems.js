@@ -20,6 +20,7 @@ const getClothingItems = (req, res) => {
 };
 
 const createClothingItem = (req, res) => {
+  console.log("req.user:", req.user);
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({

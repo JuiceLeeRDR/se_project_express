@@ -25,6 +25,7 @@ const createUser = (req, res) => {
       });
     })
     .catch((err) => {
+      console.error(err);
       if (err.code === 11000) {
         return res
           .status(CONFLICT_ERROR_CODE)
