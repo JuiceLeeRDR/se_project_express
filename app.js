@@ -6,6 +6,7 @@ const { createUser, login } = require("./controllers/users");
 const errorHandler = require("./middlewares/errors/error-handler");
 const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/loggeers");
+require("dotenv").config();
 // const auth = require("./middlewares/auth");
 
 const app = express();
