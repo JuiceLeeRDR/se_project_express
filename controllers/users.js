@@ -10,6 +10,15 @@ const {
   CONFLICT_ERROR_CODE,
   DEFAULT_ERROR_CODE,
 } = require("../utils/errors");
+
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  DefaultError,
+} = require("../middlewares/errors/error-handler");
 const { JWT_SECRET } = require("../utils/config");
 
 const createUser = (req, res) => {
@@ -28,16 +37,14 @@ const createUser = (req, res) => {
       console.error(err);
       if (err.code === 11000) {
         return res
-          .status(CONFLICT_ERROR_CODE)
+          .status(ConflictError)
           .send({ message: "A conflict has occurred" });
       }
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -49,15 +56,13 @@ const getUser = (req, res) => {
     .then((user) => res.status(REQUEST_SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
+        return res.status(NotFoundError).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -66,7 +71,7 @@ const login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
-      .status(BAD_REQUEST_ERROR_CODE)
+      .status(BadRequestError)
       .send({ message: "The password and email fields are required" });
   }
 
@@ -80,11 +85,11 @@ const login = (req, res) => {
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
         return res
-          .status(UNAUTHORIZED_ERROR_CODE)
+          .status(UnauthorizedError)
           .send({ message: "The email or password is incorrect" });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -100,12 +105,10 @@ const updateProfile = (req, res) => {
     .then((updatedUser) => res.status(REQUEST_SUCCESS_CODE).send(updatedUser))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };

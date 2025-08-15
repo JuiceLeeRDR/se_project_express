@@ -3,9 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
-const errorHandler = require("./middlewares/errors/error-handler");
+const { ErrorHandler } = require("./middlewares/errors/error-handler");
 const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middlewares/loggeers");
+const { requestLogger, errorLogger } = require("./middlewares/loggers");
 require("dotenv").config();
 // const auth = require("./middlewares/auth");
 
@@ -28,7 +28,7 @@ mongoose
 
 app.use(errorLogger);
 app.use(errors());
-app.use(errorHandler);
+app.use(ErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);

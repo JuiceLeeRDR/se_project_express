@@ -8,13 +8,22 @@ const {
   DEFAULT_ERROR_CODE,
 } = require("../utils/errors");
 
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  DefaultError,
+} = require("../middlewares/errors/error-handler");
+
 const getClothingItems = (req, res) => {
   ClothingItem.find({})
     .then((clothingItem) => res.status(REQUEST_SUCCESS_CODE).send(clothingItem))
     .catch((err) => {
       console.error(err);
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -34,12 +43,10 @@ const createClothingItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -53,7 +60,7 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (item.owner.toString() !== req.user._id) {
         return res
-          .status(FORBIDDEN_ERROR_CODE)
+          .status(ForbiddenError)
           .send({ message: "You can only delete your own items." });
       }
       return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
@@ -63,15 +70,13 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
+        return res.status(NotFoundError).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -87,17 +92,13 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item not found" });
+        return res.status(NotFoundError).send({ message: "Item not found" });
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid item ID" });
+        return res.status(BadRequestError).send({ message: "Invalid item ID" });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
@@ -113,15 +114,13 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
+        return res.status(NotFoundError).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data." });
+        return res.status(BadRequestError).send({ message: "Invalid data." });
       }
       return res
-        .status(DEFAULT_ERROR_CODE)
+        .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
     });
 };
