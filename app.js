@@ -1,13 +1,13 @@
+require("dotenv").config();
 const cors = require("cors");
+const { errors } = require("celebrate");
 const express = require("express");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
 const { ErrorHandler } = require("./middlewares/errors/error-handler");
-const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/loggers");
-require("dotenv").config();
-// const auth = require("./middlewares/auth");
+const { validateUserInfo, validateLogin } = require("./middlewares/validation");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -20,10 +20,10 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-app.post("/signin", login);
-app.post("/signup", createUser);
-
 app.use(requestLogger);
+app.post("/signin", validateLogin, login);
+app.post("/signup", validateUserInfo, createUser);
+
 app.use(mainRouter);
 mongoose
   .connect("mongodb://localhost:27017/wtwr_db")

@@ -2,20 +2,11 @@ const ClothingItem = require("../models/clothingItems");
 const {
   REQUEST_SUCCESS_CODE,
   CREATE_REQUEST_SUCCESS_CODE,
-  BAD_REQUEST_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  FORBIDDEN_ERROR_CODE,
-  DEFAULT_ERROR_CODE,
 } = require("../utils/errors");
-
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  DefaultError,
-} = require("../middlewares/errors/error-handler");
+const { DefaultError } = require("../middlewares/errors/error-handler");
+const BadRequestError = require("../middlewares/errors/bad-request");
+const ForbiddenError = require("../middlewares/errors/forbidden-request");
+const NotFoundError = require("../middlewares/errors/not-found-request");
 
 const getClothingItems = (req, res) => {
   ClothingItem.find({})

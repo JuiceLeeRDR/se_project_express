@@ -20,6 +20,7 @@ module.exports.validateCardBody = celebrate({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.url": 'the "imageUrl" field must be a valid url',
     }),
+    weather: Joi.string().valid("hot", "warm", "cold").required(),
   }),
 });
 
@@ -55,6 +56,6 @@ module.exports.validateLogIn = celebrate({
 
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().length(24),
+    itemId: Joi.string().length(24),
   }),
 });

@@ -4,24 +4,17 @@ const User = require("../models/user");
 const {
   REQUEST_SUCCESS_CODE,
   CREATE_REQUEST_SUCCESS_CODE,
-  BAD_REQUEST_ERROR_CODE,
-  UNAUTHORIZED_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  CONFLICT_ERROR_CODE,
-  DEFAULT_ERROR_CODE,
 } = require("../utils/errors");
 
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  DefaultError,
-} = require("../middlewares/errors/error-handler");
+const { DefaultError } = require("../middlewares/errors/error-handler");
+const BadRequestError = require("../middlewares/errors/bad-request");
+const NotFoundError = require("../middlewares/errors/not-found-request");
+const UnauthorizedError = require("../middlewares/errors/unauthorized-request");
+const ConflictError = require("../middlewares/errors/conflict-request");
+
 const { JWT_SECRET } = require("../utils/config");
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email } = req.body;
 
   bcrypt
@@ -33,20 +26,30 @@ const createUser = (req, res) => {
         email: user.email,
       });
     })
+    .then((data) => res.status(201).send({ data }))
     .catch((err) => {
-      console.error(err);
-      if (err.code === 11000) {
-        return res
-          .status(ConflictError)
-          .send({ message: "A conflict has occurred" });
-      }
       if (err.name === "ValidationError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        next(new BadRequestError("Invalid data"));
+      } else if (err.code === 11000) {
+        next(new ConflictError("Duplicate email error"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
     });
+  // .catch((err) => {
+  //   console.error(err);
+  //   if (err.code === 11000) {
+  //     return res
+  //       .status(ConflictError)
+  //       .send({ message: "A conflict has occurred" });
+  //   }
+  //   if (err.name === "ValidationError") {
+  //     return res.status(BadRequestError).send({ message: "Invalid data." });
+  //   }
+  //   return res
+  //     .status(DefaultError)
+  //     .send({ message: "An error has occurred on the server." });
+  // });
 };
 
 const getUser = (req, res) => {

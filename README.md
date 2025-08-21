@@ -19,3 +19,8 @@ This project was made using the Express.js and Node.js frameworks to build a bas
 ### Testing
 
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+
+## Links
+
+frontend link - https://www.betterweather.crabdance.com
+backend link - https://api.betterweather.crabdance.com
