@@ -13,9 +13,7 @@ const getClothingItems = (req, res) => {
     .then((clothingItem) => res.status(REQUEST_SUCCESS_CODE).send(clothingItem))
     .catch((err) => {
       console.error(err);
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      next(new DefaultError("An error has occured on the server."));
     });
 };
 
@@ -34,11 +32,9 @@ const createClothingItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        next(new BadRequestError( "Invalid data."));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next (new DefaultError("An error has occurred on the server." ));
     });
 };
 
@@ -61,14 +57,12 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFoundError).send({ message: err.message });
+        next(new NotFoundError( err.message));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        next(new BadRequestError( "Invalid data."));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next (new DefaultError("An error has occurred on the server." ));
     });
 };
 
@@ -83,14 +77,12 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFoundError).send({ message: "Item not found" });
+        next(new NotFoundError( "Item not found" ));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequestError).send({ message: "Invalid item ID" });
+        next(new BadRequestError( "Invalid item ID" ));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next (new DefaultError("An error has occurred on the server." ));
     });
 };
 
@@ -105,14 +97,12 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFoundError).send({ message: err.message });
+        next(new NotFoundError( err.message ));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        next(new BadRequestError( "Invalid data." ));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next (new DefaultError("An error has occurred on the server." ));
     });
 };
 

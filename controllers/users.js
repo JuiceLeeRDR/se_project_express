@@ -14,7 +14,7 @@ const ConflictError = require("../middlewares/errors/conflict-request");
 
 const { JWT_SECRET } = require("../utils/config");
 
-const createUser = (req, res, next) => {
+module.exports.createUser = (req, res, next) => {
   const { name, avatar, email } = req.body;
 
   bcrypt
@@ -36,46 +36,30 @@ const createUser = (req, res, next) => {
         next(err);
       }
     });
-  // .catch((err) => {
-  //   console.error(err);
-  //   if (err.code === 11000) {
-  //     return res
-  //       .status(ConflictError)
-  //       .send({ message: "A conflict has occurred" });
-  //   }
-  //   if (err.name === "ValidationError") {
-  //     return res.status(BadRequestError).send({ message: "Invalid data." });
-  //   }
-  //   return res
-  //     .status(DefaultError)
-  //     .send({ message: "An error has occurred on the server." });
-  // });
 };
 
-const getUser = (req, res) => {
+module.exports.getUser = (req, res) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => res.status(REQUEST_SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFoundError).send({ message: err.message });
+        return next(new NotFoundError(err.message));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        return next(new BadRequestError("Invalid data."));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-const login = (req, res) => {
+module.exports.login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res
-      .status(BadRequestError)
-      .send({ message: "The password and email fields are required" });
+    return next(
+      new BadRequestError("The password and email fields are required")
+    );
   }
 
   return User.findUserByCredentials(email, password)
@@ -87,17 +71,13 @@ const login = (req, res) => {
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
-        return res
-          .status(UnauthorizedError)
-          .send({ message: "The email or password is incorrect" });
+        return next(new Unauthorized("The email or password is incorrect"));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-const updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -108,12 +88,10 @@ const updateProfile = (req, res) => {
     .then((updatedUser) => res.status(REQUEST_SUCCESS_CODE).send(updatedUser))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(BadRequestError).send({ message: "Invalid data." });
+        return next(new BadRequestError("Invalid data."));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-module.exports = { createUser, getUser, login, updateProfile };
+// module.exports = { createUser, getUser, login, updateProfile };

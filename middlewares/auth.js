@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    return handleAuth(res);
+    return handleAuth(next);
   }
   const token = authorization.replace("Bearer ", "");
   let payload;
