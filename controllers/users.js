@@ -6,11 +6,13 @@ const {
   CREATE_REQUEST_SUCCESS_CODE,
 } = require("../utils/errors");
 
-const { DefaultError } = require("../middlewares/errors/error-handler");
-const BadRequestError = require("../middlewares/errors/bad-request");
-const NotFoundError = require("../middlewares/errors/not-found-request");
-const UnauthorizedError = require("../middlewares/errors/unauthorized-request");
-const ConflictError = require("../middlewares/errors/conflict-request");
+const { DefaultError } = require("../middlewares/errors/default-error");
+const { BadRequestError } = require("../middlewares/errors/bad-request");
+const { NotFoundError } = require("../middlewares/errors/not-found-request");
+const {
+  UnauthorizedError,
+} = require("../middlewares/errors/unauthorized-request");
+const { ConflictError } = require("../middlewares/errors/conflict-request");
 
 const { JWT_SECRET } = require("../utils/config");
 
@@ -26,7 +28,6 @@ module.exports.createUser = (req, res, next) => {
         email: user.email,
       });
     })
-    .then((data) => res.status(201).send({ data }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid data"));
@@ -38,7 +39,7 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail()
@@ -54,7 +55,7 @@ module.exports.getUser = (req, res) => {
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return next(
@@ -71,13 +72,15 @@ module.exports.login = (req, res) => {
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
-        return next(new Unauthorized("The email or password is incorrect"));
+        return next(
+          new UnauthorizedError("The email or password is incorrect")
+        );
       }
       return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(

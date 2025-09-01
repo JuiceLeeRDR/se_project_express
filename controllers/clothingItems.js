@@ -3,12 +3,12 @@ const {
   REQUEST_SUCCESS_CODE,
   CREATE_REQUEST_SUCCESS_CODE,
 } = require("../utils/errors");
-const { DefaultError } = require("../middlewares/errors/error-handler");
+const { DefaultError } = require("../middlewares/errors/default-error");
 const BadRequestError = require("../middlewares/errors/bad-request");
 const ForbiddenError = require("../middlewares/errors/forbidden-request");
 const NotFoundError = require("../middlewares/errors/not-found-request");
 
-const getClothingItems = (req, res) => {
+const getClothingItems = (req, res, next) => {
   ClothingItem.find({})
     .then((clothingItem) => res.status(REQUEST_SUCCESS_CODE).send(clothingItem))
     .catch((err) => {
@@ -17,7 +17,7 @@ const getClothingItems = (req, res) => {
     });
 };
 
-const createClothingItem = (req, res) => {
+const createClothingItem = (req, res, next) => {
   console.log("req.user:", req.user);
   const { name, weather, imageUrl } = req.body;
 
@@ -32,13 +32,13 @@ const createClothingItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        next(new BadRequestError( "Invalid data."));
+        next(new BadRequestError("Invalid data."));
       }
-      return next (new DefaultError("An error has occurred on the server." ));
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   console.log(itemId);
 
@@ -57,16 +57,16 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError( err.message));
+        next(new NotFoundError(err.message));
       }
       if (err.name === "CastError") {
-        next(new BadRequestError( "Invalid data."));
+        next(new BadRequestError("Invalid data."));
       }
-      return next (new DefaultError("An error has occurred on the server." ));
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -77,16 +77,16 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError( "Item not found" ));
+        next(new NotFoundError("Item not found"));
       }
       if (err.name === "CastError") {
-        next(new BadRequestError( "Invalid item ID" ));
+        next(new BadRequestError("Invalid item ID"));
       }
-      return next (new DefaultError("An error has occurred on the server." ));
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
@@ -97,12 +97,12 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError( err.message ));
+        next(new NotFoundError(err.message));
       }
       if (err.name === "CastError") {
-        next(new BadRequestError( "Invalid data." ));
+        next(new BadRequestError("Invalid data."));
       }
-      return next (new DefaultError("An error has occurred on the server." ));
+      return next(new DefaultError("An error has occurred on the server."));
     });
 };
 
