@@ -4,9 +4,9 @@ const {
   CREATE_REQUEST_SUCCESS_CODE,
 } = require("../utils/errors");
 const { DefaultError } = require("../middlewares/errors/default-error");
-const BadRequestError = require("../middlewares/errors/bad-request");
-const ForbiddenError = require("../middlewares/errors/forbidden-request");
-const NotFoundError = require("../middlewares/errors/not-found-request");
+const { BadRequestError } = require("../middlewares/errors/bad-request");
+const { ForbiddenError } = require("../middlewares/errors/forbidden-request");
+const { NotFoundError } = require("../middlewares/errors/not-found-request");
 
 const getClothingItems = (req, res, next) => {
   ClothingItem.find({})

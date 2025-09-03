@@ -5,7 +5,7 @@ const { errors } = require("celebrate");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
-const { ErrorHandler } = require("./middlewares/errors/error-handler");
+const errorHandler = require("./middlewares/errors/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/loggers");
 const { validateUserInfo, validateLogIn } = require("./middlewares/validation");
 
@@ -34,7 +34,7 @@ mongoose
 
 app.use(errorLogger);
 app.use(errors());
-app.use(ErrorHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
